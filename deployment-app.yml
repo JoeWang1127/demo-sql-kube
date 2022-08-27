@@ -1,0 +1,74 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: demo-sql-kube-dev
+  labels:
+    app: demo-sql-kube
+spec:
+  selector:
+    matchLabels:
+      app: demo-sql-kube
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: demo-sql-kube
+    spec:
+      containers:
+      - name: demo-app
+        image: demo-sql-kube:latest
+        imagePullPolicy: Never
+        ports:
+        - containerPort: 8080
+          name: app-port
+        env:
+        - name: SPRING_PROFILES_ACTIVE
+          value: kubernetes
+        volumeMounts:
+          - mountPath: "/config"
+            name: config
+            readOnly: true
+      volumes:
+        - name: config
+          configMap:
+            name: demo-sql-kube
+            items:
+              - key: application.yml
+                path: application.yml
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: app-service
+  labels:
+    app: app-service
+spec:
+  type: NodePort
+  selector:
+    app-name: app-demo-sql-kube
+  ports:
+  - name: service-port
+    protocol: TCP
+    port: 8080
+    targetPort: app-port
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: services-reader
+rules:
+- apiGroups: [""]
+  resources: ["services", "endpoints"]
+  verbs: ["list", "watch", "get"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: app-role-binding
+subjects:
+- kind: ServiceAccount
+  name: default
+roleRef:
+  kind: ClusterRole
+  name: services-reader
+  apiGroup: rbac.authorization.k8s.io

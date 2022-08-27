@@ -1,0 +1,33 @@
+= A Demo project for issue https://github.com/GoogleCloudPlatform/spring-cloud-gcp/issues/433[#433].
+
+1. To run the project in local environment, connecting to a local database:
++
+a. Install a postgres database exposing port 5432.
++
+b. Start the application with default profile.
+
+2. To run the project in kubernetes, connect to GCP Cloud SQL instances (tested with https://minikube.sigs.k8s.io/docs/[minikube]):
++
+a. https://minikube.sigs.k8s.io/docs/start/[Install minikube].
++
+b. Enable `gcp-auth` addon:
+[source]
++
+----
+minikube addons enable gcp-auth
+----
++
+c. In project root directory, run the following commands to build image:
+[source]
++
+----
+eval $(minikube docker-env)
+docker image build -t demo-sql-kube:latest .
+----
++
+d. Depoly the application:
+[source]
++
+----
+kubectl create -f deployment-app.yml
+----
