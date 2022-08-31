@@ -25,9 +25,10 @@ eval $(minikube docker-env)
 docker image build -t demo-sql-kube:latest .
 ----
 +
-d. Depoly the application:
+d. Depoly the config map and the application:
 [source]
 +
 ----
+kubectl create -f app-config-map.yml
 kubectl create -f deployment-app.yml
 ----
