@@ -1,6 +1,0 @@
-spring:
-  cloud:
-    kubernetes:
-      config:
-        sources:
-          - name: demo-sql-kube
